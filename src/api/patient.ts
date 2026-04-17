@@ -103,3 +103,18 @@ export async function getCertificates(patientId: number, signal?: AbortSignal): 
 export function getPdfUrl(patientId: number): string {
   return `${BASE_URL}/patient/${patientId}/vaccination-report/pdf`
 }
+
+// ─── Queue status ─────────────────────────────────────────────────────────────
+
+export interface QueueStatus {
+  found: boolean
+  name?: string
+  status?: 'waiting' | 'called' | 'in_progress' | 'done' | 'cancelled'
+  label?: string
+  position?: number
+  ahead?: number
+}
+
+export async function getQueueStatus(phone: string, signal?: AbortSignal): Promise<QueueStatus> {
+  return request<QueueStatus>('GET', `/patient/queue-status?phone=${encodeURIComponent(phone)}`, signal)
+}

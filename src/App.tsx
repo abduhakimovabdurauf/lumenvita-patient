@@ -1,30 +1,38 @@
 import { useState } from 'react'
-import { PatientSummary } from './api/patient'
-import { saveSession, loadSession, clearSession } from './lib/session'
+import { saveSession, clearSession } from './lib/session'
 import PhonePage from './pages/PhonePage'
-import ProfilePage from './pages/ProfilePage'
+import QueueStatusPage from './pages/QueueStatusPage'
+// ProfilePage is temporarily disabled — vaccination report features will be re-enabled later
+// import { PatientSummary } from './api/patient'
+// import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
-  const [patient, setPatient] = useState<PatientSummary | null>(() => loadSession())
+  const [phone, setPhone] = useState<string | null>(null)
 
-  function handleSelect(p: PatientSummary) {
-    saveSession(p)
+  function handlePhoneSubmit(submittedPhone: string) {
+    clearSession()
 
     if (window.Telegram?.WebApp?.BackButton) {
       window.Telegram.WebApp.BackButton.show()
       window.Telegram.WebApp.BackButton.onClick(() => {
-        clearSession()
-        setPatient(null)
+        setPhone(null)
         window.Telegram?.WebApp?.BackButton?.hide()
       })
     }
 
-    setPatient(p)
+    setPhone(submittedPhone)
   }
 
-  if (patient) {
-    return <ProfilePage patientId={patient.id} />
+  function handleBack() {
+    setPhone(null)
+    if (window.Telegram?.WebApp?.BackButton) {
+      window.Telegram.WebApp.BackButton.hide()
+    }
   }
 
-  return <PhonePage onSelect={handleSelect} />
+  if (phone) {
+    return <QueueStatusPage phone={phone} onBack={handleBack} />
+  }
+
+  return <PhonePage onPhoneSubmit={handlePhoneSubmit} />
 }

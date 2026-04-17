@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { Syringe } from 'lucide-react'
-import { identifyPatient, PatientSummary } from '@/api/patient'
+import { PatientSummary } from '@/api/patient'
 import { formatPhoneNumber, digitsOnly } from '@/lib/phone'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 
 interface Props {
-  onSelect: (patient: PatientSummary) => void
+  onSelect?: (patient: PatientSummary) => void
+  onPhoneSubmit?: (phone: string) => void
 }
 
-export default function PhonePage({ onSelect }: Props) {
+export default function PhonePage({ onSelect, onPhoneSubmit }: Props) {
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,11 +28,19 @@ export default function PhonePage({ onSelect }: Props) {
     e.preventDefault()
     if (digitsOnly(phone).length < 7) return
 
+    if (onPhoneSubmit) {
+      onPhoneSubmit(phone)
+      return
+    }
+
+    if (!onSelect) return
+
     setError(null)
     setPatients(null)
     setLoading(true)
 
     try {
+      const { identifyPatient } = await import('@/api/patient')
       const results = await identifyPatient(phone)
       if (results.length === 1) {
         onSelect(results[0])
@@ -61,7 +70,9 @@ export default function PhonePage({ onSelect }: Props) {
         </div>
         <h1 className="text-xl font-bold tracking-tight">LumenVita</h1>
         <p className="text-center text-sm text-muted-foreground leading-relaxed">
-          Введите номер телефона, чтобы<br />найти свою карточку вакцинации
+          {onPhoneSubmit
+            ? <>Введите номер телефона,<br />чтобы узнать статус в очереди</>
+            : <>Введите номер телефона, чтобы<br />найти свою карточку вакцинации</>}
         </p>
       </div>
 
