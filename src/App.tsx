@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { saveSession, clearSession } from './lib/session'
+import { clearSession } from './lib/session'
 import PhonePage from './pages/PhonePage'
 import QueueStatusPage from './pages/QueueStatusPage'
 // ProfilePage is temporarily disabled — vaccination report features will be re-enabled later

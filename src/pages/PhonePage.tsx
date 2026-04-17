@@ -104,7 +104,7 @@ export default function PhonePage({ onSelect, onPhoneSubmit }: Props) {
               <Card
                 key={p.id}
                 className="cursor-pointer transition-colors hover:bg-accent"
-                onClick={() => onSelect(p)}
+                onClick={() => onSelect?.(p)}
               >
                 <CardContent className="p-4">
                   <p className="font-semibold">{p.full_name}</p>
