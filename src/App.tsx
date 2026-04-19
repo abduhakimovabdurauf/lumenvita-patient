@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { clearSession } from './lib/session'
+import { savePhoneToken, loadPhoneToken, clearPhoneToken } from './lib/session'
 import PhonePage from './pages/PhonePage'
 import QueueStatusPage from './pages/QueueStatusPage'
 // ProfilePage is temporarily disabled — vaccination report features will be re-enabled later
@@ -7,14 +7,15 @@ import QueueStatusPage from './pages/QueueStatusPage'
 // import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
-  const [phone, setPhone] = useState<string | null>(null)
+  const [phone, setPhone] = useState<string | null>(() => loadPhoneToken())
 
   function handlePhoneSubmit(submittedPhone: string) {
-    clearSession()
+    savePhoneToken(submittedPhone)
 
     if (window.Telegram?.WebApp?.BackButton) {
       window.Telegram.WebApp.BackButton.show()
       window.Telegram.WebApp.BackButton.onClick(() => {
+        clearPhoneToken()
         setPhone(null)
         window.Telegram?.WebApp?.BackButton?.hide()
       })
@@ -24,6 +25,7 @@ export default function App() {
   }
 
   function handleBack() {
+    clearPhoneToken()
     setPhone(null)
     if (window.Telegram?.WebApp?.BackButton) {
       window.Telegram.WebApp.BackButton.hide()

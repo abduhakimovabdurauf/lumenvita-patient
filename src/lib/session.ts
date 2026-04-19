@@ -1,36 +1,34 @@
-import type { PatientSummary } from '@/api/patient'
+const PHONE_KEY = 'lv_phone_token'
+const TTL = 60 * 60 * 1000 // 1 hour in ms
 
-const KEY = 'lv_patient_session'
-const TTL = 30 * 60 * 1000 // 30 minutes in ms
-
-interface Session {
-  patient: PatientSummary
+interface PhoneToken {
+  phone: string
   savedAt: number
 }
 
-export function saveSession(patient: PatientSummary): void {
-  const session: Session = { patient, savedAt: Date.now() }
-  localStorage.setItem(KEY, JSON.stringify(session))
+export function savePhoneToken(phone: string): void {
+  const token: PhoneToken = { phone, savedAt: Date.now() }
+  localStorage.setItem(PHONE_KEY, JSON.stringify(token))
 }
 
-export function loadSession(): PatientSummary | null {
+export function loadPhoneToken(): string | null {
   try {
-    const raw = localStorage.getItem(KEY)
+    const raw = localStorage.getItem(PHONE_KEY)
     if (!raw) return null
 
-    const session: Session = JSON.parse(raw)
-    if (Date.now() - session.savedAt > TTL) {
-      localStorage.removeItem(KEY)
+    const token: PhoneToken = JSON.parse(raw)
+    if (Date.now() - token.savedAt > TTL) {
+      localStorage.removeItem(PHONE_KEY)
       return null
     }
 
-    return session.patient
+    return token.phone
   } catch {
-    localStorage.removeItem(KEY)
+    localStorage.removeItem(PHONE_KEY)
     return null
   }
 }
 
-export function clearSession(): void {
-  localStorage.removeItem(KEY)
+export function clearPhoneToken(): void {
+  localStorage.removeItem(PHONE_KEY)
 }
